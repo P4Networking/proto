@@ -1,17 +1,6 @@
 // Copyright 2018 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
+// Copyright 2018-present Open Networking Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 // This file include all the common internal messages used by Stratum stack.
 
@@ -44,19 +33,18 @@ enum TriState {
 // Target platforms (aka the type of the switch/chassis).
 enum Platform {
   PLT_UNKNOWN = 0;  // default
-  PLT_GOOGLE_ULYSSES = 1;
-  PLT_GOOGLE_LYRA = 2;
-  PLT_GOOGLE_TRAPEZIUM = 3;
-  PLT_GOOGLE_TRAPEZIUM2 = 4;
-  PLT_GOOGLE_ALNITAK = 5;
-  PLT_GOOGLE_ALHENA = 6;
-  PLT_GOOGLE_POLLUX = 7;
-  PLT_GOOGLE_CENTAURI_SHIVA_SHIVA = 8;
+  PLT_GENERIC_TRIDENT_PLUS = 1;
+  PLT_GENERIC_TRIDENT2 = 2;
+  PLT_GENERIC_TOMAHAWK = 3;
+  PLT_GENERIC_TOMAHAWK_PLUS = 4;
+  PLT_GENERIC_TOMAHAWK2 = 5;
+  PLT_GENERIC_TOMAHAWK3 = 6;
   PLT_MLNX_SN2700 = 9;
   PLT_P4_SOFT_SWITCH = 10;
-  PLT_BAREFOOT_TOFINO = 11;
-  PLT_BAREFOOT_TOFINO2 = 12;
-  // TODO(aghaffar): Add all the BCM and MLNX based platforms.
+  PLT_NP4_INTEL_N3000 = 13;
+  PLT_GENERIC_BAREFOOT_TOFINO = 14;
+  PLT_GENERIC_BAREFOOT_TOFINO2 = 15;
+  // TODO(unknown): Add all the BCM and MLNX based platforms.
 }
 
 // List of traffic classes (aka class of services).
@@ -91,11 +79,11 @@ message ChassisConfigParams {
     uint32 lacp_system_priority = 2;
   }
   message NtpConfig {
-    // TODO(aghaffar): See if there is anything in YANG models which can ne
+    // TODO(unknown): See if there is anything in YANG models which can ne
     // used here.
   }
   message PowerConfig {
-    // TODO(aghaffar): See if there is anything in YANG models which can ne
+    // TODO(unknown): See if there is anything in YANG models which can ne
     // used here.
   }
   message FanConfig {
@@ -142,7 +130,7 @@ message ChassisConfigParams {
 
 // Flow-related parameters for for switching nodes (aka chips).
 message NodeFlowParams {
-  // TODO(aghaffar): Complete this.
+  // TODO(unknown): Complete this.
 }
 
 // Config-related parameters for switching nodes (aka chips).
@@ -245,7 +233,7 @@ message NodeConfigParams {
 
 // Flow-related parameters for the ports (singleton and trunk ports).
 message PortFlowParams {
-  // TODO(aghaffar): Complete this.
+  // TODO(unknown): Complete this.
 }
 
 // FEC operational mode for a singleton port.
@@ -262,7 +250,7 @@ message PortConfigParams {
   // These are the only hash config we need to provide per node, for ports that
   // are part of a trunk/lag or ECMP group.
   message HashConfig {
-    // TODO(aghaffar): Instead of hash_select, we need a better way. this is
+    // TODO(unknown): Instead of hash_select, we need a better way. this is
     // RTAG7 specific. Maybe based on the port type?
     int32 rtag7_ecmp_hash_select = 1;
     int32 rtag7_lag_hash_select = 2;
@@ -285,6 +273,10 @@ message PortConfigParams {
   ModulationType modulation_type = 5;
   // FEC operational mode
   FecMode fec_mode = 6;
+  // The configured mac address for this port.
+  uint64 mac_address = 7;
+  // The configured loopback state for this port.
+  LoopbackState loopback_mode = 8;
 }
 
 // Chassis uniquely identifies a switch with a single management interface,
@@ -368,6 +360,28 @@ message SingletonPort {
   PortConfigParams config_params = 8;
 }
 
+// OpticalNetworkInterface uniquely identifies a single physical optical
+// network interface on a single chassis.
+message OpticalNetworkInterface {
+  // The unique optical network interface ID.
+  uint32 id = 1;
+  // An optional arbitrary name for the optical port. WILL NOT BE PARSED.
+  string name = 2;
+  // The 1-based module index of this port.
+  int32 module = 3;
+  // The 1-based network interface index of this port.
+  int32 network_interface = 4;
+  // Optical channel frequency in Hz.
+  uint64 frequency = 5;
+  // Target output optical power level of the optical channel, expressed in
+  // increments of 0.01 decibel-milliwats.
+  double target_output_power = 6;
+  // Optical channel operational mode.
+  uint64 operational_mode = 7;
+  // Optical channel line port value.
+  string line_port = 8;
+}
+
 // TrunkPort uniquely identifies a single trunk port on a single chassis and
 // all its flow-related and config-related parameters. This message is the
 // only message we will use to specify trunk ports in the HAL and avoid
@@ -446,7 +460,7 @@ message GoogleConfig {
       int32 cpu_queue = 2;
       int32 vlan = 3;
       BcmKnetIntfPurpose purpose = 4;
-      // TODO(aghaffar): Anything else?
+      // TODO(unknown): Anything else?
     }
     repeated BcmKnetIntfConfig knet_intf_configs = 1;
   }
@@ -516,8 +530,8 @@ message GoogleConfig {
   }
 
   // BcmBufferConfig defines the buffer carving config for a BCM unit.
-  // TODO(aghaffar): This still needs modification. Not ready yet.
-  // TODO(aghaffar): Add documentation.
+  // TODO(unknown): This still needs modification. Not ready yet.
+  // TODO(unknown): Add documentation.
   message BcmBufferConfig {
     message ServicePoolConfig {
       uint32 sp_num = 1;
@@ -545,7 +559,7 @@ message GoogleConfig {
   }
 
   // BcmRtag7HashConfig defines RTAG7 hash config for a unit.
-  // TODO(aghaffar): Add documentation.
+  // TODO(unknown): Add documentation.
   message BcmRtag7HashConfig {
     enum HashField {
       UNKNOWN_FIELD = 0;
@@ -636,7 +650,7 @@ message GoogleConfig {
   // chassis map.
   string bcm_chassis_map_id = 1;
   // Maps from the index of the nodes (1-based) to all the configs related to
-  // hat specific node.
+  // that specific node.
   map<uint64, BcmKnetConfig> node_id_to_knet_config = 2;
   map<uint64, BcmRxConfig> node_id_to_rx_config = 3;
   map<uint64, BcmTxConfig> node_id_to_tx_config = 4;
@@ -645,8 +659,35 @@ message GoogleConfig {
   map<uint64, BcmRtag7HashConfig> node_id_to_rtag7_hash_config = 7;
 }
 
+// Config specific to Tofino chassis.
+message TofinoConfig {
+  message BfPortShapingConfig {
+    message BfPerPortShapingConfig {
+      message PacketShape {
+        uint64 max_rate_pps = 1;
+        uint32 max_burst_packets = 2;
+      }
+      message ByteShape {
+        uint64 max_rate_bps = 1;
+        uint32 max_burst_bytes = 2;
+      }
+      oneof shaping {
+        PacketShape packet_shaping = 1;
+        ByteShape byte_shaping = 2;
+      }
+    }
+    // Map from port id to its shaping config given by BfPerPortShapingConfig.
+    map<uint32, BfPerPortShapingConfig> per_port_shaping_configs = 1;
+  }
+
+  // Maps from the index of the nodes (1-based) to all the configs related to
+  // that specific node.
+  map<uint64, BfPortShapingConfig> node_id_to_port_shaping_config = 1;
+}
+
 message VendorConfig {
   GoogleConfig google_config = 1;
+  TofinoConfig tofino_config = 2;
 }
 
 //------------------------------------------------------------------------------
@@ -669,6 +710,7 @@ message ChassisConfig {
   repeated TrunkPort trunk_ports = 5;
   repeated PortGroup port_groups = 6;
   VendorConfig vendor_config = 7;
+  repeated OpticalNetworkInterface optical_network_interfaces = 8;
 }
 
 //------------------------------------------------------------------------------
@@ -715,6 +757,18 @@ enum TrunkMemberBlockState {
   TRUNK_MEMBER_BLOCK_STATE_FORWARDING = 2;
 }
 
+// A generic enum for describing the loopback state of a singleton port.
+enum LoopbackState {
+  // Default/invalid state.
+  LOOPBACK_STATE_UNKNOWN = 0;
+  // Normal/non-loopback state.
+  LOOPBACK_STATE_NONE = 1;
+  // Loopback packets at the MAC layer of the port.
+  LOOPBACK_STATE_MAC = 2;
+  // Loopback packets at the PHY layer of the port.
+  LOOPBACK_STATE_PHY = 3;
+}
+
 // A generic enum for describing the administrative state (aka admin state) of
 // a HW component. Admin state is typically the "intended oper state". After
 // the admin state of a HW component changes, we expect the oper state to change
@@ -744,7 +798,7 @@ enum AdminState {
   // HW component is being used by a diagnostics SW underneath and should not be
   // used like a normal component. Setting a HW component to diag mode will
   // eventually change the HW state of the component.
-  // TODO(aghaffar): This mode is not supported at the moment.
+  // TODO(unknown): This mode is not supported at the moment.
   ADMIN_STATE_DIAG = 3;
 }
 
@@ -845,7 +899,6 @@ enum PhysicalPortType {
   PHYSICAL_PORT_TYPE_CFP_CAGE = 6;
   PHYSICAL_PORT_TYPE_BACKPLANE = 7;
   PHYSICAL_PORT_TYPE_DWDM = 8;
-  PHYSICAL_PORT_TYPE_OCS = 9;
 }
 
 // The media type for a frontpanel port.
@@ -854,18 +907,14 @@ enum MediaType {
   MEDIA_TYPE_QSFP_SR4 = 1;
   MEDIA_TYPE_QSFP_LR4 = 2;
   MEDIA_TYPE_QSFP_COPPER = 3;
-  MEDIA_TYPE_LPK = 4;
   MEDIA_TYPE_SFP = 5;
   MEDIA_TYPE_QSFP_PSM4 = 6;
   MEDIA_TYPE_CFP_LR4 = 7;
   MEDIA_TYPE_CFP_COPPER = 8;
   MEDIA_TYPE_BP_COPPER = 9;
-  MEDIA_TYPE_OCS = 10;  // used by OCS like Palomar.
   MEDIA_TYPE_QSFP_CSR4 = 11;
   MEDIA_TYPE_QSFP_CLR4 = 12;    // IEEE LR4
-  MEDIA_TYPE_QSFP_CGR4 = 13;    // Google custom LR optics (non-IEEE LR)
   MEDIA_TYPE_QSFP_CCR4 = 14;    // 100G copper
-  MEDIA_TYPE_CFP_ADAPTER = 15;  // New CFP adapter type used in UTP
 }
 
 // TODO(unknown): revise these enum as needed per ASIC integration
@@ -876,6 +925,7 @@ enum SfpType {
   SFP_TYPE_QSFP      = 2;
   SFP_TYPE_QSFP_PLUS = 3;
   SFP_TYPE_QSFP28    = 4;
+  SFP_TYPE_SFP28     = 5;
 }
 
 // TODO(unknown): revise these enum as needed per ASIC integration
@@ -1004,6 +1054,39 @@ message FrontPanelPortInfo {
   HwState hw_state = 6;
 }
 
+// Optical channel state and configuration.
+message OpticalTransceiverInfo {
+  message Power {
+    // The instantaneous value of the statistic.
+    double instant = 1;
+    // The arithmetic mean value of the statistic over the time interval.
+    double avg = 2;
+    // The time interval over which the statistics are computed.
+    uint64 interval = 3;
+    // The maximum value of the statistic over the time interval.
+    double max = 4;
+    // The absolute time at which the maximum value occurred.
+    uint64 max_time = 5;
+    // The minimum value of the statistic over the time interval.
+    double min = 6;
+    // The absolute time at which the minimum value occurred.
+    uint64 min_time = 7;
+  }
+
+  // Optical channel frequency in Hz.
+  uint64 frequency = 1;
+  // The input/output optical power of this port in units of 0.01 decibel-milliwatt.
+  // If the port is an aggregate of multiple physical channels, this attribute
+  // is the total power or sum of all channels.
+  Power input_power = 2;
+  Power output_power = 3;
+  // Target output optical power level of the optical channel, expressed in
+  // increments of 0.01 decibel-milliwats.
+  double target_output_power = 4;
+  // Vendor-specific optical channel operational mode.
+  uint64 operational_mode = 5;
+}
+
 //------------------------------------------------------------------------------
 // Monitoring related messages.
 //------------------------------------------------------------------------------
@@ -1011,6 +1094,11 @@ message FrontPanelPortInfo {
 // Wrapper around oper state of a port.
 message OperStatus {
   PortState state = 1;  // required
+}
+
+// Wrapper around loopback state of a port.
+message LoopbackStatus {
+  LoopbackState state = 1;  // required
 }
 
 // Wrapper around admin state of a HW component.
@@ -1075,6 +1163,12 @@ message Alarm {
   bool status = 4;          // required.
 }
 
+// Wrapper around the optional node info.
+message NodeInfo {
+  string vendor_name = 1;
+  string chip_name = 2;
+}
+
 // Wrapper around an optional debug info for a node/chip.
 message NodeDebugInfo {
   string debug_string = 1;
@@ -1107,6 +1201,16 @@ message FecStatus {
   FecMode mode = 1;
 }
 
+// Wrapper around the SDN port ID.
+// The target is expected to accept requests from the controller
+// using the ID assigned by the SDN management system. If the target
+// cannot accept requests using the provided ID, it can provide
+// an alterate ID that should be used by the controller to address
+// the interface.
+message SdnPortId {
+  uint32 port_id = 1;
+}
+
 // DataRequest is a message used internally to request data about a component
 // or a set of components through SwitchInterface. It is specifically used in
 // ConfigMonitoringService, as part of gNMI Get/Subscribe RPC implementation.
@@ -1130,6 +1234,11 @@ message DataRequest {
       uint32 port_id = 2;
       uint32 queue_id = 3;
     }
+    // Data required to set info for a specific optical network interface.
+    message OpticalNetworkInterface {
+      int32 module = 1;
+      int32 network_interface = 2;
+    }
     oneof request {
       Port oper_status = 1;
       Port admin_status = 2;
@@ -1149,6 +1258,10 @@ message DataRequest {
       Port front_panel_port_info = 16;
       Port hardware_port = 17;
       Port fec_status = 18;
+      OpticalNetworkInterface optical_transceiver_info = 19;
+      Port loopback_status = 20;
+      Node node_info = 21;
+      Port sdn_port_id = 22;
     }
   }
   repeated Request requests = 1;
@@ -1178,6 +1291,10 @@ message DataResponse {
     FrontPanelPortInfo front_panel_port_info = 16;
     HardwarePort hardware_port = 17;
     FecStatus fec_status = 18;
+    OpticalTransceiverInfo optical_transceiver_info = 19;
+    LoopbackStatus loopback_status = 20;
+    NodeInfo node_info = 21;
+    SdnPortId sdn_port_id = 22;
   }
 }
 
@@ -1205,20 +1322,32 @@ message SetRequest {
         AutonegotiationStatus autoneg_status = 9;
         // The new forwarding viability of the port.
         ForwardingViability forwarding_viability = 10;
+        // The intended loopback state of the port.
+        LoopbackStatus loopback_status = 11;
       }
     }
     // Data required to set info for a specific node.
     message Node {
-      // TODO(aghaffar): Add this.
+      // TODO(unknown): Add this.
     }
     // Data required to set info for a specific chassis.
     message Chassis {
-      // TODO(aghaffar): Add this.
+      // TODO(unknown): Add this.
+    }
+    // Data required to set info for a specific optical network interface.
+    message OpticalNetworkInterface {
+      int32 module = 1;
+      int32 network_interface = 2;
+      oneof value {
+        // The new optical channel configurable values.
+        OpticalTransceiverInfo optical_transceiver_info = 3;
+      }
     }
     oneof request {
       Port port = 1;
       Node node = 2;
       Chassis chassis = 3;
+      OpticalNetworkInterface optical_network_interface = 4;
     }
   }
   repeated Request requests = 1;
