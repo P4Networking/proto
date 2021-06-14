@@ -24,8 +24,8 @@
 syntax = "proto3";
 import "google/rpc/status.proto";
 
-package bfrt_proto;
 option go_package="go/p4";
+package bfrt_proto;
 
 service BfRuntime {
   // Update one or more P4 entities on the target.
@@ -52,6 +52,7 @@ service BfRuntime {
 message WriteRequest {
   TargetDevice target = 1;
   uint32 client_id = 2;
+
   // The write batch, comprising a list of Update operations.
   repeated Update updates = 3;
   enum Atomicity {
@@ -80,6 +81,7 @@ message WriteRequest {
     DATAPLANE_ATOMIC = 2;
   }
   Atomicity atomicity = 4;
+  string p4_name = 5;
 }
 
 message WriteResponse {}
@@ -88,6 +90,7 @@ message ReadRequest {
   TargetDevice target = 1;
   uint32 client_id = 2;
   repeated Entity entities = 3;
+  string p4_name = 4;
 }
 
 message ReadResponse { repeated Entity entities = 1; }
@@ -122,22 +125,39 @@ message Entity {
     TableAttribute table_attribute = 3;
     TableOperation table_operation = 4;
     ObjectId object_id = 5;
+    HandleId handle = 6;
+  }
+}
+
+message HandleId {
+  uint32 table_id = 1;
+  oneof value {
+    TableKey key = 2;
+    uint32 handle_id = 3;
   }
 }
 
 message TableEntry {
   uint32 table_id = 1;
-  TableKey key = 2;
+  oneof value {
+    TableKey key = 2;
+    uint32 handle_id = 7;
+  }
   TableData data = 3;
   bool is_default_entry = 4;
-  TableReadFlag table_read_flag = 5;
-  TableModIncFlag table_mod_inc_flag = 6;
+  // Deprecated, please use table_flags
+  TableReadFlag table_read_flag = 5 [ deprecated = true ];
+  TableModIncFlag table_mod_inc_flag = 6 [ deprecated = true ];
+  TargetDevice entry_tgt = 8;
+  TableFlags table_flags = 9;
 }
 
 message TableUsage {
   uint32 table_id = 1;
   uint32 usage = 2;
-  TableReadFlag table_read_flag = 3;
+  // Deprecated, please use table_flags
+  TableReadFlag table_read_flag = 3 [ deprecated = true ];
+  TableFlags table_flags = 4;
 }
 
 message TableAttribute {
@@ -160,7 +180,6 @@ message TableOperation {
 }
 
 message TableData {
-  // For tables with a single action, 'action_id' is optional.
   uint32 action_id = 1;
   repeated DataField fields = 2;
 }
@@ -177,9 +196,11 @@ message DataField {
     BoolArray bool_arr_val = 6;
     ContainerArray container_arr_val = 7;
     bool bool_val = 8;
+    StrArray str_arr_val = 9;
   }
   message IntArray { repeated uint32 val = 1; }
   message BoolArray { repeated bool val = 1; }
+  message StrArray { repeated string val = 1; }
   message ContainerArray {
     message Container { repeated DataField val = 1; }
     repeated Container container = 1;
@@ -220,8 +241,20 @@ message KeyField {
   }
 }
 
-message TableReadFlag { bool from_hw = 1; }
+// Deprecated, please use TableFlags
+message TableReadFlag {
+ bool from_hw = 1;
+ bool key_only = 2;
+}
 
+message TableFlags {
+ bool from_hw = 1;
+ bool key_only = 2;
+ bool mod_del = 3;
+ bool reset_ttl = 4;
+}
+
+// Deprecated, please use TableFlags
 message TableModIncFlag {
   enum Type {
     // Enum to add the given data incrementally to the
@@ -344,11 +377,10 @@ message StreamMessageRequest {
 }
 
 message Subscribe {
-  bool is_master = 1; // This field is used to indicate whether this client
-                      // wants mastership of the device. Only a master can issue
-                      // any of the SetForwardingPipelineConfigRequest.Actions.
-                      // Other clients can only execute BIND. At a time, only
-                      // one master can be present.
+  bool is_master = 1 [ deprecated = true ];
+           // Master for Warm Init messages.
+           // Deprecated and not needed anymore.
+           // Keeping for backward compatibility.
   uint32 device_id = 2; // Device ID
   message Notifications {
     bool enable_learn_notifications =
@@ -392,6 +424,10 @@ message StreamMessageResponse {
                // on the stream as well because all the active clients need to
                // be informed of a COMMIT_STARTED or COMMIT_FINISHED
   }
+}
+
+message SubscribeResponse {
+  Error status = 1;
 }
 
 message DigestList {
