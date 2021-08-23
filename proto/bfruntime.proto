@@ -233,11 +233,17 @@ message KeyField {
     bytes high = 2;
   }
 
+  message Optional {
+    bytes value = 1;
+    bool is_valid = 2;
+  }
+
   oneof match_type {
     Exact exact = 2;
     Ternary ternary = 3;
     LPM lpm = 4;
     Range range = 5;
+    Optional optional = 6;
   }
 }
 
